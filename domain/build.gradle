@@ -1,0 +1,22 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation 'junit:junit:4.13.2'
+    def javaInjectVersion = '1'
+    implementation "javax.inject:javax.inject:$javaInjectVersion"
+
+    testImplementation "io.mockk:mockk:1.12.3"
+
+    def rxJavaVersion = "3.1.4"
+    def rxKotlinVersion = "3.0.1"
+    implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
+    implementation "io.reactivex.rxjava3:rxkotlin:$rxKotlinVersion"
+}
