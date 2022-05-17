@@ -21,4 +21,5 @@
     <string name="rankings">Rankings</string>
     <string name="games_played">Games played: %1$d</string>
     <string name="games_won">Games won: %1$d</string>
+    <string name="common_error">Error</string>
 </resources>

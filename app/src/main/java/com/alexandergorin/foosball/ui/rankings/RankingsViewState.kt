@@ -2,11 +2,11 @@ package com.alexandergorin.foosball.ui.rankings
 
 sealed class RankingsViewState {
     object Loading : RankingsViewState()
-    data class Loaded(val rankings: List<Ranking>) : RankingsViewState()
+    data class Loaded(val rankings: List<RankingState>) : RankingsViewState()
     object Error : RankingsViewState()
 }
 
-data class Ranking(
+data class RankingState(
     val id: String,
     val personName: String,
     val gamesPlayed: String,

@@ -8,15 +8,18 @@ import com.alexandergorin.foosball.R
 import com.alexandergorin.foosball.core.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class MatchesViewModel @Inject constructor(
     private val appRepository: AppRepository,
-    resourceProvider: ResourceProvider
+    resourceProvider: ResourceProvider,
+    @Named("UIScheduler") private val uiScheduler: Scheduler
 ) : ViewModel() {
 
     private val bag = CompositeDisposable()
@@ -44,6 +47,7 @@ class MatchesViewModel @Inject constructor(
                     }
                 )
             }
+            .observeOn(uiScheduler)
             .onErrorReturn { MatchesViewState.Error }
             .startWith(Observable.just(MatchesViewState.Loading))
             .subscribeBy { viewState ->

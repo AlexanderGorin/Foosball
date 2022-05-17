@@ -14,8 +14,7 @@ import javax.inject.Named
 
 class AppRepositoryImpl @Inject constructor(
     private val database: AppDatabase,
-    @Named("IOScheduler") private val ioScheduler: Scheduler,
-    @Named("UIScheduler") private val uiScheduler: Scheduler
+    @Named("IOScheduler") private val ioScheduler: Scheduler
 ) : AppRepository {
 
     override fun getMatches(): Flowable<List<Match>> {
@@ -29,7 +28,7 @@ class AppRepositoryImpl @Inject constructor(
                     id = match.id
                 )
             }
-        }.map { it.reversed() }.subscribeOn(ioScheduler).observeOn(uiScheduler)
+        }.map { it.reversed() }.subscribeOn(ioScheduler)
     }
 
     override fun getMatch(id: Int): Single<Match> {
@@ -41,7 +40,7 @@ class AppRepositoryImpl @Inject constructor(
                 secondScore = match.score2,
                 id = match.id
             )
-        }.subscribeOn(ioScheduler).observeOn(uiScheduler)
+        }.subscribeOn(ioScheduler)
     }
 
     override fun addMatch(match: Match): Completable {
@@ -52,7 +51,7 @@ class AppRepositoryImpl @Inject constructor(
                 person2 = match.secondPersonName,
                 score2 = match.secondScore
             )
-        ).subscribeOn(ioScheduler).observeOn(uiScheduler)
+        ).subscribeOn(ioScheduler)
     }
 
     override fun addMatches(matches: List<Match>): Completable {
@@ -65,7 +64,7 @@ class AppRepositoryImpl @Inject constructor(
                     score2 = match.secondScore
                 )
             }
-        ).subscribeOn(ioScheduler).observeOn(uiScheduler)
+        ).subscribeOn(ioScheduler)
     }
 
     override fun updateMatch(match: Match): Completable {
@@ -75,7 +74,7 @@ class AppRepositoryImpl @Inject constructor(
             firstScore = match.firstScore,
             secondPersonName = match.secondPersonName,
             secondScore = match.secondScore
-        ).subscribeOn(ioScheduler).observeOn(uiScheduler)
+        ).subscribeOn(ioScheduler)
     }
 
     override fun getRankings(): Flowable<List<Ranking>> {
@@ -114,7 +113,7 @@ class AppRepositoryImpl @Inject constructor(
                     )
                 }
 
-        }.subscribeOn(ioScheduler).observeOn(uiScheduler)
+        }.subscribeOn(ioScheduler)
     }
 
 }

@@ -12,15 +12,18 @@ import com.alexandergorin.foosball.ui.matches.MatchState
 import com.jakewharton.rxrelay3.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class EditMatchViewModel @Inject constructor(
     private val appRepository: AppRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    @Named("UIScheduler") private val uiScheduler: Scheduler
 ) : ViewModel() {
 
     private val bag = CompositeDisposable()
@@ -36,6 +39,9 @@ class EditMatchViewModel @Inject constructor(
 
     private val mutableNavigateBackEvent = SingleLiveEvent<Unit>()
     val navigateBackEvent: LiveData<Unit> = mutableNavigateBackEvent
+
+    private val mutableErrorEvent = SingleLiveEvent<String>()
+    val errorEvent: LiveData<String> = mutableErrorEvent
 
     private val firstPersonNameRelay = BehaviorRelay.createDefault("")
     private val secondPersonNameRelay = BehaviorRelay.createDefault("")
@@ -70,7 +76,6 @@ class EditMatchViewModel @Inject constructor(
     fun loadMatch(type: EditMatchType) {
         if (type is EditMatchType.Edit) {
             appRepository.getMatch(type.matchId)
-                .toObservable()
                 .map { match ->
                     MatchState(
                         id = match.id,
@@ -79,11 +84,16 @@ class EditMatchViewModel @Inject constructor(
                         secondPersonName = match.secondPersonName,
                         secondPersonScore = match.secondScore.toString(),
                     )
-
                 }
-                .subscribeBy { viewState ->
-                    mutableMatchViewState.value = viewState
-                }
+                .observeOn(uiScheduler)
+                .subscribeBy(
+                    onError = {
+                        mutableErrorEvent.value = resourceProvider.getString(R.string.common_error)
+                    },
+                    onSuccess = { viewState ->
+                        mutableMatchViewState.value = viewState
+                    }
+                )
                 .addTo(bag)
         }
     }
@@ -104,9 +114,13 @@ class EditMatchViewModel @Inject constructor(
                 firstScore = firstPersonScoreRelay.value?.toInt() ?: 0,
                 secondScore = secondPersonScoreRelay.value?.toInt() ?: 0
             )
-        ).subscribeBy {
-            mutableNavigateBackEvent.call()
-        }
+        ).observeOn(uiScheduler)
+            .subscribeBy(
+                onError = {
+                    mutableErrorEvent.value = resourceProvider.getString(R.string.common_error)
+                },
+                onComplete = mutableNavigateBackEvent::call
+            ).addTo(bag)
     }
 
     private fun addMatch() {
@@ -117,9 +131,13 @@ class EditMatchViewModel @Inject constructor(
                 firstScore = firstPersonScoreRelay.value?.toInt() ?: 0,
                 secondScore = secondPersonScoreRelay.value?.toInt() ?: 0
             )
-        ).subscribeBy {
-            mutableNavigateBackEvent.call()
-        }
+        ).observeOn(uiScheduler)
+            .subscribeBy(
+                onError = {
+                    mutableErrorEvent.value = resourceProvider.getString(R.string.common_error)
+                },
+                onComplete = mutableNavigateBackEvent::call
+            ).addTo(bag)
     }
 
     fun onFirstPersonNameChange(value: String) {

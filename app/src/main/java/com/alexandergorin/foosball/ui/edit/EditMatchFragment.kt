@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.alexandergorin.foosball.core.base.BaseFragment
 import com.alexandergorin.foosball.databinding.EditMatchFragmentBinding
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -53,6 +54,10 @@ class EditMatchFragment : BaseFragment<EditMatchFragmentBinding>() {
 
         viewModel.appBarTitle.observe(viewLifecycleOwner) { title ->
             requireActivity().title = title
+        }
+
+        viewModel.errorEvent.observe(viewLifecycleOwner) { message ->
+            Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
         }
 
         binding.saveButton.setOnClickListener {
