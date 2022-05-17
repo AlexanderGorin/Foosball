@@ -9,12 +9,14 @@ java {
 }
 
 dependencies {
+    // tests
     implementation 'junit:junit:4.13.2'
+
+    // DI
     def javaInjectVersion = '1'
     implementation "javax.inject:javax.inject:$javaInjectVersion"
 
-    testImplementation "io.mockk:mockk:1.12.3"
-
+    // rx
     def rxJavaVersion = "3.1.4"
     def rxKotlinVersion = "3.0.1"
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
