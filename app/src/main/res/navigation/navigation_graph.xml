@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_matches">
+
+    <fragment
+        android:id="@+id/navigation_matches"
+        android:name="com.alexandergorin.foosball.ui.matches.MatchesFragment"
+        tools:layout="@layout/matches_fragment">
+        <action
+            android:id="@+id/action_navigation_matches_to_editMatchFragment"
+            app:destination="@id/editMatchFragment" />
+        <action
+            android:id="@+id/action_navigation_matches_to_rankingsFragment"
+            app:destination="@id/rankingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editMatchFragment"
+        android:name="com.alexandergorin.foosball.ui.edit.EditMatchFragment"
+        tools:layout="@layout/edit_match_fragment">
+        <argument
+            android:name="type"
+            app:argType="com.alexandergorin.foosball.ui.edit.EditMatchFragmentType" />
+    </fragment>
+    <fragment
+        android:id="@+id/rankingsFragment"
+        android:name="com.alexandergorin.foosball.ui.rankings.RankingsFragment"
+        tools:layout="@layout/rankings_fragment" />
+
+</navigation>
