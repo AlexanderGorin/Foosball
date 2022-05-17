@@ -5,25 +5,28 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.alexandergorin.domain.AppRepository
 import com.alexandergorin.domain.Match
+import com.alexandergorin.foosball.R
+import com.alexandergorin.foosball.core.ResourceProvider
 import com.alexandergorin.foosball.core.SingleLiveEvent
 import com.alexandergorin.foosball.ui.matches.MatchState
 import com.jakewharton.rxrelay3.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class EditMatchViewModel @Inject constructor(
     private val appRepository: AppRepository,
-    @Named("UIScheduler") private val uiScheduler: Scheduler,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val bag = CompositeDisposable()
+
+    private val mutableAppBarTitle = MutableLiveData<String>()
+    val appBarTitle: LiveData<String> = mutableAppBarTitle
 
     private val mutableMatchViewState = MutableLiveData<MatchState>()
     val matchViewState: LiveData<MatchState> = mutableMatchViewState
@@ -56,43 +59,57 @@ class EditMatchViewModel @Inject constructor(
         }.addTo(bag)
     }
 
-    fun loadMatch(id: Int) {
-        appRepository.getMatch(id)
-            .toObservable()
-            .observeOn(uiScheduler)
-            .map { match ->
-                MatchState(
-                    id = match.id,
-                    firstPersonName = match.firstPersonName,
-                    firstPersonScore = match.firstScore.toString(),
-                    secondPersonName = match.secondPersonName,
-                    secondPersonScore = match.secondScore.toString(),
-                )
-
-            }
-            .subscribeBy { viewState ->
-                mutableMatchViewState.value = viewState
-            }
-            .addTo(bag)
+    fun loadAppBarTitle(type: EditMatchType) {
+        val title = when (type) {
+            EditMatchType.Add -> resourceProvider.getString(R.string.add_your_match)
+            is EditMatchType.Edit -> resourceProvider.getString(R.string.edit_your_match)
+        }
+        mutableAppBarTitle.value = title
     }
 
-    fun saveMatch(id: Int) {
+    fun loadMatch(type: EditMatchType) {
+        if (type is EditMatchType.Edit) {
+            appRepository.getMatch(type.matchId)
+                .toObservable()
+                .map { match ->
+                    MatchState(
+                        id = match.id,
+                        firstPersonName = match.firstPersonName,
+                        firstPersonScore = match.firstScore.toString(),
+                        secondPersonName = match.secondPersonName,
+                        secondPersonScore = match.secondScore.toString(),
+                    )
 
+                }
+                .subscribeBy { viewState ->
+                    mutableMatchViewState.value = viewState
+                }
+                .addTo(bag)
+        }
+    }
+
+    fun saveMatch(type: EditMatchType) {
+        when (type) {
+            EditMatchType.Add -> addMatch()
+            is EditMatchType.Edit -> updateMatch(type)
+        }
+    }
+
+    private fun updateMatch(type: EditMatchType.Edit) {
         appRepository.updateMatch(
             Match(
-                id = id,
+                id = type.matchId,
                 firstPersonName = firstPersonNameRelay.value.orEmpty(),
                 secondPersonName = secondPersonNameRelay.value.orEmpty(),
                 firstScore = firstPersonScoreRelay.value?.toInt() ?: 0,
                 secondScore = secondPersonScoreRelay.value?.toInt() ?: 0
             )
-        ).observeOn(uiScheduler)
-            .subscribeBy {
-                mutableNavigateBackEvent.call()
-            }
+        ).subscribeBy {
+            mutableNavigateBackEvent.call()
+        }
     }
 
-    fun addMatch() {
+    private fun addMatch() {
         appRepository.addMatch(
             Match(
                 firstPersonName = firstPersonNameRelay.value.orEmpty(),
@@ -100,10 +117,9 @@ class EditMatchViewModel @Inject constructor(
                 firstScore = firstPersonScoreRelay.value?.toInt() ?: 0,
                 secondScore = secondPersonScoreRelay.value?.toInt() ?: 0
             )
-        ).observeOn(uiScheduler)
-            .subscribeBy {
-                mutableNavigateBackEvent.call()
-            }
+        ).subscribeBy {
+            mutableNavigateBackEvent.call()
+        }
     }
 
     fun onFirstPersonNameChange(value: String) {

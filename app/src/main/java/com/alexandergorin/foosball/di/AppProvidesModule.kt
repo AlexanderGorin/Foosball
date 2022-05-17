@@ -11,7 +11,7 @@ import javax.inject.Named
 
 @Module
 @InstallIn(SingletonComponent::class)
-class AppModule {
+class AppProvidesModule {
 
     @Provides
     @Named("IOScheduler")

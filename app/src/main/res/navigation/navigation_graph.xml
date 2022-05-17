@@ -23,7 +23,7 @@
         tools:layout="@layout/edit_match_fragment">
         <argument
             android:name="type"
-            app:argType="com.alexandergorin.foosball.ui.edit.EditMatchFragmentType" />
+            app:argType="com.alexandergorin.foosball.ui.edit.EditMatchType" />
     </fragment>
     <fragment
         android:id="@+id/rankingsFragment"

@@ -1,4 +1,4 @@
-package com.alexandergorin.foosball
+package com.alexandergorin.foosball.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.alexandergorin.foosball.R
 import com.alexandergorin.foosball.databinding.MainActivityBinding
 import dagger.hilt.android.AndroidEntryPoint
 

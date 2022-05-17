@@ -8,21 +8,22 @@ import com.alexandergorin.foosball.R
 import com.alexandergorin.foosball.core.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class RankingsViewModel @Inject constructor(
     private val appRepository: AppRepository,
-    private val resourceProvider: ResourceProvider,
-    @Named("UIScheduler") private val uiScheduler: Scheduler,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val bag = CompositeDisposable()
+
+    val appBarTitle: LiveData<String> = MutableLiveData(
+        resourceProvider.getString(R.string.rankings)
+    )
 
     private val mutableRankingsViewState = MutableLiveData<RankingsViewState>()
     val rankingsViewState: LiveData<RankingsViewState> = mutableRankingsViewState
@@ -30,7 +31,6 @@ class RankingsViewModel @Inject constructor(
     fun loadRankings() {
         appRepository.getRankings()
             .toObservable()
-            .observeOn(uiScheduler)
             .map<RankingsViewState> { rankings ->
                 RankingsViewState.Loaded(
                     rankings.map { ranking ->

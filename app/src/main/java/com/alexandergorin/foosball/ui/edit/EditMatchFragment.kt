@@ -1,12 +1,13 @@
 package com.alexandergorin.foosball.ui.edit
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.alexandergorin.foosball.R
 import com.alexandergorin.foosball.core.base.BaseFragment
 import com.alexandergorin.foosball.databinding.EditMatchFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,15 +33,8 @@ class EditMatchFragment : BaseFragment<EditMatchFragmentBinding>() {
 
         val type = args.type
 
-        val title = when (type) {
-            EditMatchFragmentType.Add -> getString(R.string.add_your_match)
-            is EditMatchFragmentType.Edit -> getString(R.string.edit_your_match)
-        }
-        requireActivity().title = title
-
-        if (type is EditMatchFragmentType.Edit) {
-            viewModel.loadMatch(type.matchId)
-        }
+        viewModel.loadAppBarTitle(type)
+        viewModel.loadMatch(type)
 
         viewModel.matchViewState.observe(viewLifecycleOwner) { match ->
             binding.firstPersonNameEditText.setText(match.firstPersonName)
@@ -57,11 +51,12 @@ class EditMatchFragment : BaseFragment<EditMatchFragmentBinding>() {
             navController.navigateUp()
         }
 
+        viewModel.appBarTitle.observe(viewLifecycleOwner) { title ->
+            requireActivity().title = title
+        }
+
         binding.saveButton.setOnClickListener {
-            when (type) {
-                EditMatchFragmentType.Add -> viewModel.addMatch()
-                is EditMatchFragmentType.Edit -> viewModel.saveMatch(type.matchId)
-            }
+            viewModel.saveMatch(type)
         }
 
         binding.firstPersonNameEditText.doAfterTextChanged {

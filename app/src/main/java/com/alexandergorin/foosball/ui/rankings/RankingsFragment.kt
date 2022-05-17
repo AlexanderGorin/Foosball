@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.alexandergorin.foosball.R
 import com.alexandergorin.foosball.core.base.BaseFragment
 import com.alexandergorin.foosball.databinding.RankingsFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,8 +27,6 @@ class RankingsFragment : BaseFragment<RankingsFragmentBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = requireViewBinding()
-        requireActivity().title = getString(R.string.rankings)
-
 
         binding.matchesRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -37,6 +34,9 @@ class RankingsFragment : BaseFragment<RankingsFragmentBinding>() {
         viewModel.loadRankings()
 
         viewModel.rankingsViewState.observe(viewLifecycleOwner, ::renderState)
+        viewModel.appBarTitle.observe(viewLifecycleOwner) { title ->
+            requireActivity().title = title
+        }
     }
 
     private fun renderState(viewState: RankingsViewState) {

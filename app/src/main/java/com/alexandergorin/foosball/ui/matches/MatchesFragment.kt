@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alexandergorin.foosball.R
 import com.alexandergorin.foosball.core.base.BaseFragment
 import com.alexandergorin.foosball.databinding.MatchesFragmentBinding
-import com.alexandergorin.foosball.ui.edit.EditMatchFragmentType
+import com.alexandergorin.foosball.ui.edit.EditMatchType
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,7 +34,6 @@ class MatchesFragment : BaseFragment<MatchesFragmentBinding>() {
 
         val binding = requireViewBinding()
         val navController = findNavController()
-        requireActivity().title = getString(R.string.app_name)
 
         binding.matchesRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -42,7 +41,7 @@ class MatchesFragment : BaseFragment<MatchesFragmentBinding>() {
         binding.addMatchButton.setOnClickListener {
             navController.navigate(
                 MatchesFragmentDirections.actionNavigationMatchesToEditMatchFragment(
-                    EditMatchFragmentType.Add
+                    EditMatchType.Add
                 )
             )
         }
@@ -50,6 +49,9 @@ class MatchesFragment : BaseFragment<MatchesFragmentBinding>() {
         viewModel.loadMatches()
 
         viewModel.matchesViewState.observe(viewLifecycleOwner, ::renderState)
+        viewModel.appBarTitle.observe(viewLifecycleOwner) { title ->
+            requireActivity().title = title
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -81,7 +83,7 @@ class MatchesFragment : BaseFragment<MatchesFragmentBinding>() {
                     MatchesRecyclerViewAdapter(viewState.matches) { matchId ->
                         navController.navigate(
                             MatchesFragmentDirections.actionNavigationMatchesToEditMatchFragment(
-                                EditMatchFragmentType.Edit(matchId)
+                                EditMatchType.Edit(matchId)
                             )
                         )
                     }

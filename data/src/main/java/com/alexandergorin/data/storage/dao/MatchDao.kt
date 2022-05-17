@@ -13,10 +13,10 @@ import io.reactivex.rxjava3.core.Single
 interface MatchDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMatch(match: MatchEntity): Single<Long>
+    fun insertMatch(match: MatchEntity): Completable
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMatches(matches: List<MatchEntity>): Single<List<Long>>
+    fun insertMatches(matches: List<MatchEntity>): Completable
 
     @Query("SELECT * FROM MatchEntity")
     fun getMatches(): Flowable<List<MatchEntity>>
@@ -32,22 +32,5 @@ interface MatchDao {
         secondPersonName: String,
         secondScore: Int
     ): Completable
-//
-//    @Query("UPDATE MatchEntity SET systolicBpValue=:systolicValue, diastolicBpValue=:diastolicValue WHERE id = :userId")
-//    suspend fun updateBloodPressure(userId: Long, systolicValue: Int, diastolicValue: Int)
-//
-//    @Query("UPDATE MatchEntity SET firstName=:firstName, middleName=:middleName, lastName=:lastName WHERE id = :userId")
-//    suspend fun updateNames(userId: Long, firstName: String, middleName: String, lastName: String)
-//
-//    @Query("UPDATE MatchEntity SET firstName=:firstName, lastName=:lastName WHERE id = :userId")
-//    suspend fun updateNames(userId: Long, firstName: String, lastName: String)
-//
-//    @Query("UPDATE MatchEntity SET ktpValue=:ktpValue WHERE id = :userId")
-//    suspend fun updateKtp(userId: Long, ktpValue: String)
-//
-//    @Query("UPDATE MatchEntity SET height=:height WHERE id = :userId")
-//    suspend fun updateHeight(userId: Long, height: Int)
-//
-//    @Query("DELETE FROM MatchEntity")
-//    suspend fun deleteUserTable()
+
 }
